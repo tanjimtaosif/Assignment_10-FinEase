@@ -1,3 +1,4 @@
+// src/router/AppRouter.jsx
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import PrivateRoute from "../layouts/PrivateRoute";
@@ -18,16 +19,23 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
             { path: "/", element: <Home /> },
+
+            // auth
             { path: "/login", element: <Login /> },
             { path: "/register", element: <Register /> },
 
+            // protected
             { path: "/add-transaction", element: <PrivateRoute><AddTransaction /></PrivateRoute> },
             { path: "/my-transactions", element: <PrivateRoute><MyTransactions /></PrivateRoute> },
+            { path: "/reports", element: <PrivateRoute><Reports /></PrivateRoute> },
+
+            // details/edit (protected)
             { path: "/transaction/:id", element: <PrivateRoute><TransactionDetails /></PrivateRoute> },
             { path: "/transaction/update/:id", element: <PrivateRoute><UpdateTransaction /></PrivateRoute> },
-            { path: "/reports", element: <PrivateRoute><Reports /></PrivateRoute> },
+
+            // profile (protected)
             { path: "/profile", element: <PrivateRoute><Profile /></PrivateRoute> },
         ],
     },
-    { path: "*", element: <NotFound /> }, // renders without layout (no navbar/footer)
+    { path: "*", element: <NotFound /> }, 
 ]);
