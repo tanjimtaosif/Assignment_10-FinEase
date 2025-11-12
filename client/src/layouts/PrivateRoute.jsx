@@ -6,15 +6,8 @@ export default function PrivateRoute({ children }) {
     const { user, loadingAuth } = useAuth();
     const location = useLocation();
 
-    if (loadingAuth) {
-        return <Spinner fullScreen />;
-    }
+    if (loadingAuth) return <Spinner fullScreen />;
+    if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
 
-    // Redirect to login if user not found
-    if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
-
-    // Render protected content
     return children;
 }
