@@ -1,8 +1,12 @@
 // src/pages/Home.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import api from "../lib/axiosConfig";
 
-const fmt = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
+const fmt = new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "USD", // change to "BDT" if you want BDT here
+});
 
 export default function Home() {
     const { user } = useAuth();
@@ -10,24 +14,50 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!user?.email) return;
+        if (!user?.email) {
+            // if user logs out, clear summary
+            setSummary({ balance: 0, income: 0, expense: 0 });
+            return;
+        }
+
         let ignore = false;
+
         (async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`/api/analytics/summary?email=${encodeURIComponent(user.email)}`);
-                if (!res.ok) throw new Error("Failed to load overview");
-                const data = await res.json();
-                if (!ignore)
+
+                // ✅ correct backend route + axios instance
+                const res = await api.get("/api/transactions/summary", {
+                    params: { email: user.email },
+                });
+
+                const data = res.data || {};
+
+                if (!ignore) {
+                    const income = Number(data.income || 0);
+                    const expense = Number(data.expense || 0);
+                    const balance =
+                        typeof data.balance === "number"
+                            ? data.balance
+                            : income - expense;
+
                     setSummary({
-                        balance: data.balance || 0,
-                        income: data.income || 0,
-                        expense: data.expense || 0,
+                        income,
+                        expense,
+                        balance,
                     });
+                }
+            } catch (err) {
+                console.error("Failed to load overview:", err?.response?.data || err);
+                if (!ignore) {
+                    // keep it simple: just show zeros on error
+                    setSummary({ balance: 0, income: 0, expense: 0 });
+                }
             } finally {
                 if (!ignore) setLoading(false);
             }
         })();
+
         return () => {
             ignore = true;
         };
@@ -57,7 +87,8 @@ export default function Home() {
                     {/* TEXT - only tagline + quote */}
                     <div className="max-w-xl mx-auto text-center md:text-left">
                         <p className="mt-6 text-base-content/80 text-xl italic leading-relaxed">
-                            “A budget is telling your money where to go instead of wondering where it went.”
+                            “A budget is telling your money where to go instead of wondering
+                            where it went.”
                         </p>
                     </div>
                 </div>
@@ -74,9 +105,20 @@ export default function Home() {
                         </>
                     ) : (
                         <>
-                            <StatCard title="Total Balance" value={fmt.format(summary.balance)} />
-                            <StatCard title="Total Income" value={fmt.format(summary.income)} tone="success" />
-                            <StatCard title="Total Expense" value={fmt.format(summary.expense)} tone="error" />
+                            <StatCard
+                                title="Total Balance"
+                                value={fmt.format(summary.balance)}
+                            />
+                            <StatCard
+                                title="Total Income"
+                                value={fmt.format(summary.income)}
+                                tone="success"
+                            />
+                            <StatCard
+                                title="Total Expense"
+                                value={fmt.format(summary.expense)}
+                                tone="error"
+                            />
                         </>
                     )}
                 </section>
@@ -97,10 +139,13 @@ export default function Home() {
 
                 <div className="card bg-base-100 shadow-md rounded-2xl">
                     <div className="card-body p-6 sm:p-8">
-                        <h3 className="card-title font-bold mb-3 text-lg">Why Financial Planning Matters</h3>
+                        <h3 className="card-title font-bold mb-3 text-lg">
+                            Why Financial Planning Matters
+                        </h3>
                         <p className="text-base-content/70 leading-relaxed">
-                            Small daily choices compound into big long-term results. Clear visibility of your
-                            spending habits is the first step to improvement.
+                            Small daily choices compound into big long-term results. Clear
+                            visibility of your spending habits is the first step to
+                            improvement.
                         </p>
                     </div>
                 </div>
@@ -113,7 +158,11 @@ export default function Home() {
 
 function StatCard({ title, value, tone = "neutral" }) {
     const toneClass =
-        tone === "success" ? "text-success" : tone === "error" ? "text-error" : "text-primary";
+        tone === "success"
+            ? "text-success"
+            : tone === "error"
+                ? "text-error"
+                : "text-primary";
     return (
         <div className="card bg-base-100 shadow-sm rounded-2xl">
             <div className="card-body p-6 sm:p-8">
