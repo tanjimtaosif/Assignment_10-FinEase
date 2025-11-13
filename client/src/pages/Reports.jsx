@@ -68,13 +68,12 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-
       {/* Controls */}
       <div className="card bg-base-100 shadow-sm rounded-2xl">
         <div className="card-body p-6 sm:p-7 md:p-8">
           <div className="grid gap-4 md:grid-cols-[1fr,auto] md:items-end">
             <div>
-              <h1 className="text-2xl font-bold">Reports & Analytics</h1>
+              <h1 className="text-2xl font-bold">Reports &amp; Analytics</h1>
               <p className="text-sm text-base-content/70">
                 Visualize your spending and income patterns.
               </p>
@@ -87,7 +86,10 @@ export default function Reports() {
                 onChange={(e) => setMonth(e.target.value)}
                 className="input input-bordered h-10 rounded-xl"
               />
-              <button className="btn btn-outline h-10 rounded-xl" onClick={fetchReports}>
+              <button
+                className="btn btn-outline h-10 rounded-xl"
+                onClick={fetchReports}
+              >
                 Refresh
               </button>
             </div>
@@ -97,13 +99,12 @@ export default function Reports() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
+        {/* Green gradient */}
         <SummaryCard title="Total Income" value={totalIncome} tone="success" />
+        {/* Red gradient */}
         <SummaryCard title="Total Expense" value={totalExpense} tone="error" />
-        <SummaryCard
-          title="Balance"
-          value={balance}
-          tone={balance >= 0 ? "success" : "error"}
-        />
+        {/* Blue gradient */}
+        <SummaryCard title="Balance" value={balance} tone="neutral" />
       </div>
 
       {/* Charts */}
@@ -119,8 +120,16 @@ export default function Reports() {
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-          <PieChartComponent data={pieData} title="Expenses by Category" height={340} />
-          <BarChartComponent data={barData} title="Income vs Expense" height={340} />
+          <PieChartComponent
+            data={pieData}
+            title="Expenses by Category"
+            height={340}
+          />
+          <BarChartComponent
+            data={barData}
+            title="Income vs Expense"
+            height={340}
+          />
         </div>
       )}
 
@@ -143,7 +152,6 @@ export default function Reports() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
@@ -151,18 +159,24 @@ export default function Reports() {
 /* Helpers */
 
 function SummaryCard({ title, value, tone = "neutral" }) {
-  const color =
+  // Match the gradients from the overview section:
+  // neutral  -> blue
+  // success  -> green
+  // error    -> red
+  const gradientClass =
     tone === "success"
-      ? "text-success"
+      ? "from-emerald-500 via-emerald-600 to-emerald-700"
       : tone === "error"
-        ? "text-error"
-        : "text-primary";
+        ? "from-rose-500 via-rose-600 to-rose-700"
+        : "from-sky-500 via-sky-600 to-indigo-700";
 
   return (
-    <div className="card bg-base-100 shadow-sm rounded-2xl">
+    <div
+      className={`card shadow-sm rounded-2xl bg-gradient-to-br ${gradientClass} text-white`}
+    >
       <div className="card-body p-5">
-        <h3 className="card-title text-base">{title}</h3>
-        <p className={`text-3xl font-extrabold ${color}`}>
+        <h3 className="text-sm font-medium opacity-90">{title}</h3>
+        <p className="text-3xl font-extrabold">
           {formatCurrency(value)}
         </p>
       </div>
