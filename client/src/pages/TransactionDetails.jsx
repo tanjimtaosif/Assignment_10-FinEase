@@ -2,59 +2,136 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../lib/axiosConfig";
 import toast from "react-hot-toast";
+import Spinner from "../components/Spinner";
 
 export default function TransactionDetails() {
   const { id } = useParams();
   const [txn, setTxn] = useState(null);
   const [categoryTotal, setCategoryTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    let isMounted = true;
+
+    const load = async () => {
       try {
-        // TODO: replace with real API
+        setLoading(true);
+
+        // 1) Fetch the transaction by id
         const res = await api.get(`/api/transactions/${id}`);
-        setTxn(res.data);
-        const sum = await api.get(`/api/reports/summary?category=${res.data.category}`);
-        setCategoryTotal(sum.data?.categoryTotal ?? 0);
+        const tx = res.data?.data || res.data; // supports {data: {...}} or raw object
+
+        if (!isMounted) return;
+        setTxn(tx);
+
+        // 2) Fetch total for this category (if your server supports it)
+        try {
+          const sumRes = await api.get("/api/reports/summary", {
+            params: { category: tx.category },
+          });
+          const total = sumRes.data?.categoryTotal ?? 0;
+          if (isMounted) setCategoryTotal(total);
+        } catch (err) {
+          // summary is optional – don’t break the page if it fails
+          console.error("Category summary failed", err);
+        }
       } catch (err) {
-        toast.error("Failed to load details");
+        console.error(err);
+        if (isMounted) {
+          toast.error(
+            err?.response?.data?.message || "Failed to load transaction details"
+          );
+        }
+      } finally {
+        if (isMounted) setLoading(false);
       }
-    })();
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
-  if (!txn) {
+  if (loading) {
     return (
-      <div className="grid place-items-center py-12">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+      <div className="py-12">
+        <Spinner />
       </div>
     );
   }
 
+  if (!txn) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-base-content/70">Transaction not found.</p>
+        <Link to="/my-transactions" className="btn btn-primary mt-4">
+          Back to list
+        </Link>
+      </div>
+    );
+  }
+
+  const isIncome = txn.type === "income";
+  const amountLabel = `${isIncome ? "+" : "-"}$${Number(txn.amount).toFixed(2)}`;
+
   return (
-    <div className="card bg-base-100 shadow-sm">
-      <div className="card-body">
-        <h1 className="card-title">Transaction Details</h1>
+    <div className="card bg-base-100 shadow-sm rounded-2xl">
+      <div className="card-body p-6 sm:p-8 space-y-6">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold">Transaction Details</h1>
+            <p className="text-sm text-base-content/70">
+              View full information about this transaction.
+            </p>
+          </div>
+          <span
+            className={`badge badge-lg ${
+              isIncome ? "badge-success" : "badge-error"
+            }`}
+          >
+            {txn.type === "income" ? "Income" : "Expense"}
+          </span>
+        </header>
+
         <div className="grid md:grid-cols-2 gap-4">
-          <Detail label="Type" value={txn.type} />
           <Detail label="Category" value={txn.category} />
-          <Detail label="Amount" value={`$${Number(txn.amount).toFixed(2)}`} />
-          <Detail label="Date" value={new Date(txn.date).toLocaleDateString()} />
-          <Detail label="Description" value={txn.description || "—"} className="md:col-span-2" />
-          <Detail label="User" value={`${txn.name} (${txn.email})`} className="md:col-span-2" />
+          <Detail label="Amount" value={amountLabel} />
+          <Detail
+            label="Date"
+            value={new Date(txn.date).toLocaleDateString()}
+          />
+          <Detail
+            label="User"
+            value={`${txn.name || "Unknown"} (${txn.email || "N/A"})`}
+          />
+          <Detail
+            label="Description"
+            value={txn.description || "No description provided."}
+            className="md:col-span-2"
+          />
         </div>
 
-        <div className="alert mt-4">
+        {/* Category total (optional info) */}
+        <div className="alert alert-soft mt-2 bg-base-200/70 border-none">
           <span>
-            Total amount for category <b>{txn.category}</b>:{" "}
+            Total amount for <b>{txn.category}</b>:{" "}
             <b>${Number(categoryTotal).toFixed(2)}</b>
           </span>
         </div>
 
-        <div className="card-actions justify-end">
-          <Link to={`/transaction/update/${txn._id}`} className="btn btn-outline">
+        <div className="card-actions justify-end pt-4 gap-2">
+          <Link
+            to={`/transaction/update/${txn._id}`}
+            className="btn btn-outline btn-sm sm:btn-md"
+          >
             Edit
           </Link>
-          <Link to="/my-transactions" className="btn btn-primary">
+          <Link
+            to="/my-transactions"
+            className="btn btn-primary btn-sm sm:btn-md"
+          >
             Back to list
           </Link>
         </div>
@@ -65,9 +142,13 @@ export default function TransactionDetails() {
 
 function Detail({ label, value, className = "" }) {
   return (
-    <div className={`p-3 rounded-lg bg-base-200 ${className}`}>
-      <p className="text-xs uppercase tracking-wide text-base-content/60">{label}</p>
-      <p className="font-medium">{value}</p>
+    <div
+      className={`p-3 rounded-xl bg-base-200/70 border border-base-200/70 ${className}`}
+    >
+      <p className="text-xs uppercase tracking-wide text-base-content/60 mb-0.5">
+        {label}
+      </p>
+      <p className="font-medium break-words">{value}</p>
     </div>
   );
 }
