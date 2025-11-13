@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+/* -----------------------------------------
+   Select styling for light + dark mode
+   (must come AFTER Tailwind imports)
+------------------------------------------ */
+
+/* Default (light mode) */
+select,
+select option {
+    background-color: #f9fafb;
+    /* near white */
+    color: #111827;
+    /* near black */
+}
+
+/* Dark mode override – DaisyUI uses data-theme on <html> */
+html[data-theme="dark"] select,
+html[data-theme="dark"] select option {
+    background-color: #111827 !important;
+    /* dark slate */
+    color: #e5e7eb !important;
+    /* light gray text */
+}
