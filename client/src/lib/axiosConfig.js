@@ -6,7 +6,7 @@ const api = axios.create({
     // remove any trailing slashes just in case
     baseURL:
         import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") ||
-        "http://localhost:5000",
+        "https://finease-omega.vercel.app/",
     timeout: 15000,
     headers: {
         "Content-Type": "application/json",

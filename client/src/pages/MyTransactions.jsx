@@ -298,9 +298,9 @@ function ConfirmModal({ open, onCancel, onConfirm }) {
                 onClick={onCancel}
             />
             <div className="relative z-10 flex min-h-full items-center justify-center px-4">
-                <div className="w-full max-w-md rounded-2xl bg-base-100 shadow-2xl p-6">
+                <div className="w-full max-w-md rounded-2xl bg-base-100 text-base-content shadow-2xl p-6">
                     <h3 className="text-lg font-semibold mb-1">Delete transaction?</h3>
-                    <p className="text-sm text-base-content/70 mb-5">
+                    <p className="text-sm opacity-70 mb-5">
                         This action cannot be undone.
                     </p>
                     <div className="flex justify-end gap-2">
@@ -320,6 +320,7 @@ function ConfirmModal({ open, onCancel, onConfirm }) {
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>,
         document.body

@@ -2,10 +2,17 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { isValidEmail, isValidPassword } from "../lib/validate";
-import { updateProfile } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import { FaGoogle } from "react-icons/fa";
+import {
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import toast from "react-hot-toast";
 import { HiOutlineEye, HiOutlineEyeSlash } from "react-icons/hi2";
+
+const googleProvider = new GoogleAuthProvider();
 
 export default function Register() {
   const { register } = useAuth();
@@ -17,6 +24,7 @@ export default function Register() {
   });
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const nav = useNavigate();
   const loc = useLocation();
   const from = loc.state?.from?.pathname || "/";
@@ -28,19 +36,46 @@ export default function Register() {
     if (!isValidEmail(form.email)) return toast.error("Enter a valid email.");
     if (!isValidPassword(form.password))
       return toast.error("Password must be 6+ chars with upper & lower case.");
+
     try {
       setLoading(true);
       await register(form.email, form.password);
+
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, {
           displayName: form.name || null,
           photoURL: form.photoURL || null,
         });
       }
+
       toast.success("Account created!");
       nav(from, { replace: true });
     } catch (err) {
-      toast.error(err.message || "Registration failed");
+      toast.error(err?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔹 Google sign-in / register
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      toast.success(
+        user?.displayName
+          ? `Signed in as ${user.displayName}`
+          : "Signed in with Google"
+      );
+
+      nav(from, { replace: true });
+    } catch (err) {
+      // Common Firebase errors: popup-closed-by-user, cancelled, etc.
+      if (err?.code !== "auth/popup-closed-by-user") {
+        toast.error(err?.message || "Google sign-in failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -57,7 +92,7 @@ export default function Register() {
           </p>
         </div>
 
-        {/* Card (shadow only, no border) */}
+        {/* Card */}
         <div className="card bg-base-100 shadow-2xl rounded-2xl">
           <div className="card-body p-6 sm:p-8">
             <form onSubmit={submit} className="space-y-5">
@@ -81,7 +116,9 @@ export default function Register() {
               {/* Photo URL (optional) */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-medium">Photo URL (optional)</span>
+                  <span className="label-text font-medium">
+                    Photo URL (optional)
+                  </span>
                 </label>
                 <input
                   name="photoURL"
@@ -142,14 +179,15 @@ export default function Register() {
                   </button>
                 </div>
                 <p className="mt-1 text-xs text-base-content/60">
-                  Must be at least 6 characters and include uppercase & lowercase letters.
+                  Must be at least 6 characters and include uppercase & lowercase
+                  letters.
                 </p>
               </div>
 
               {/* Submit */}
               <button
                 className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold
-                           transition-colors cursor-pointer"
+                           transition-colors cursor-pointer disabled:opacity-70"
                 disabled={loading}
                 aria-busy={loading}
                 type="submit"
@@ -157,6 +195,33 @@ export default function Register() {
                 {loading ? "Creating..." : "Create account"}
               </button>
             </form>
+
+            {/* Divider */}
+            <div className="my-5 flex items-center gap-3">
+              <div className="h-px flex-1 bg-base-300" />
+              <span className="text-xs uppercase text-base-content/50">
+                or
+              </span>
+              <div className="h-px flex-1 bg-base-300" />
+            </div>
+
+            {/* Google button */}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full h-11 rounded-xl border border-base-300 bg-base-100
+                         flex items-center justify-center gap-2 text-sm font-medium
+                         hover:bg-base-200 transition-colors disabled:opacity-70"
+            >
+              <img
+
+                alt=""
+                
+              />
+              <FaGoogle className="text-lg" />
+              <span>Continue with Google</span>
+            </button>
 
             {/* Footer */}
             <p className="text-sm text-base-content/70 text-center mt-5">
