@@ -17,14 +17,14 @@ export default function TransactionDetails() {
       try {
         setLoading(true);
 
-        // 1) Fetch the transaction by id
+        // Fetch the transaction by id
         const res = await api.get(`/api/transactions/${id}`);
         const tx = res.data?.data || res.data; // supports {data: {...}} or raw object
 
         if (!isMounted) return;
         setTxn(tx);
 
-        // 2) Fetch total for this category (if your server supports it)
+        // Fetch total for this category 
         try {
           const sumRes = await api.get("/api/reports/summary", {
             params: { category: tx.category },
@@ -32,14 +32,14 @@ export default function TransactionDetails() {
           const total = sumRes.data?.categoryTotal ?? 0;
           if (isMounted) setCategoryTotal(total);
         } catch (err) {
-          // summary is optional – don’t break the page if it fails
           console.error("Category summary failed", err);
         }
       } catch (err) {
         console.error(err);
         if (isMounted) {
           toast.error(
-            err?.response?.data?.message || "Failed to load transaction details"
+            err?.response?.data?.message ||
+            "Failed to load transaction details"
           );
         }
       } finally {
@@ -74,11 +74,13 @@ export default function TransactionDetails() {
   }
 
   const isIncome = txn.type === "income";
-  const amountLabel = `${isIncome ? "+" : "-"}$${Number(txn.amount).toFixed(2)}`;
+  const amountNumber = Number(txn.amount || 0);
+  const amountLabel = `${isIncome ? "+" : "-"}BDT ${amountNumber.toFixed(2)}`;
 
   return (
     <div className="card bg-base-100 shadow-sm rounded-2xl">
       <div className="card-body p-6 sm:p-8 space-y-6">
+        {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Transaction Details</h1>
@@ -87,14 +89,14 @@ export default function TransactionDetails() {
             </p>
           </div>
           <span
-            className={`badge badge-lg ${
-              isIncome ? "badge-success" : "badge-error"
-            }`}
+            className={`badge badge-lg ${isIncome ? "badge-success" : "badge-error"
+              }`}
           >
-            {txn.type === "income" ? "Income" : "Expense"}
+            {isIncome ? "Income" : "Expense"}
           </span>
         </header>
 
+        {/* Info grid */}
         <div className="grid md:grid-cols-2 gap-4">
           <Detail label="Category" value={txn.category} />
           <Detail label="Amount" value={amountLabel} />
@@ -113,26 +115,27 @@ export default function TransactionDetails() {
           />
         </div>
 
-        {/* Category total (optional info) */}
-        <div className="alert alert-soft mt-2 bg-base-200/70 border-none">
+        {/* Category total */}
+        <div className="mt-4 rounded-xl bg-base-200/60 px-4 py-3 text-sm text-base-content/80">
           <span>
             Total amount for <b>{txn.category}</b>:{" "}
-            <b>${Number(categoryTotal).toFixed(2)}</b>
+            <b>BDT {Number(categoryTotal || 0).toFixed(2)}</b>
           </span>
         </div>
 
-        <div className="card-actions justify-end pt-4 gap-2">
-          <Link
-            to={`/transaction/update/${txn._id}`}
-            className="btn btn-outline btn-sm sm:btn-md"
-          >
-            Edit
-          </Link>
+        {/* Actions */}
+        <div className="pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <Link
             to="/my-transactions"
-            className="btn btn-primary btn-sm sm:btn-md"
+            className="btn btn-ghost btn-sm sm:btn-md w-full sm:w-auto"
           >
             Back to list
+          </Link>
+          <Link
+            to={`/transaction/update/${txn._id}`}
+            className="btn btn-primary btn-sm sm:btn-md w-full sm:w-auto"
+          >
+            Edit
           </Link>
         </div>
       </div>
@@ -143,7 +146,7 @@ export default function TransactionDetails() {
 function Detail({ label, value, className = "" }) {
   return (
     <div
-      className={`p-3 rounded-xl bg-base-200/70 border border-base-200/70 ${className}`}
+      className={`p-3 rounded-xl bg-base-100 border border-base-300/60 ${className}`}
     >
       <p className="text-xs uppercase tracking-wide text-base-content/60 mb-0.5">
         {label}
