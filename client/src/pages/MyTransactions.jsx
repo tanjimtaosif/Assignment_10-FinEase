@@ -12,17 +12,17 @@ import {
 } from "react-icons/hi2";
 import { useAuth } from "../context/AuthContext";
 
-const LIMIT = 8; // items per page (must match server default if you change it)
+const LIMIT = 8;
 
 export default function MyTransactions() {
     const { user } = useAuth();
 
-    const [items, setItems] = useState([]); // current page items
-    const [total, setTotal] = useState(0); // total matching items in DB
+    const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
 
-    const [type, setType] = useState("all"); // all | income | expense
-    const [sortBy, setSortBy] = useState("date"); // date | amount
-    const [order, setOrder] = useState("desc"); // asc | desc
+    const [type, setType] = useState("all");
+    const [sortBy, setSortBy] = useState("date");
+    const [order, setOrder] = useState("desc");
     const [q, setQ] = useState("");
     const [page, setPage] = useState(1);
 
@@ -297,7 +297,7 @@ function ConfirmModal({ open, onCancel, onConfirm }) {
                 onClick={onCancel}
             />
             <div className="relative z-10 flex min-h-full items-center justify-center px-4">
-                <div className="w-full max-w-md rounded-2xl bg-base-100 text-base-content shadow-2xl p-6">
+                <div className="w-full max-w-md rounded-2xl bg-white text-base-content shadow-2xl p-6">
                     <h3 className="text-lg font-semibold mb-1">Delete transaction?</h3>
                     <p className="text-sm opacity-70 mb-5">
                         This action cannot be undone.
