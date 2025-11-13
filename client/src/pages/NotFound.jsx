@@ -4,13 +4,6 @@ export default function NotFound() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-base-content px-6">
             <div className="max-w-lg text-center">
-                {/* Illustration */}
-                <img
-                    src="https://illustrations.popsy.co/gray/error-404.svg"
-                    alt="Not Found Illustration"
-                    className="w-72 mx-auto mb-6 opacity-90"
-                />
-
                 {/* Text Content */}
                 <h1 className="text-6xl font-bold text-primary">404</h1>
                 <h2 className="text-2xl font-semibold mt-2">Page Not Found</h2>
