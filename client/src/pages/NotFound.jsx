@@ -17,9 +17,6 @@ export default function NotFound() {
                     <Link to="/" className="btn btn-primary">
                         Go Home
                     </Link>
-                    <Link to="/login" className="btn btn-outline">
-                        Login Page
-                    </Link>
                 </div>
             </div>
 
