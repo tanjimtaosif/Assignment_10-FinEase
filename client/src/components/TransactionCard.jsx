@@ -15,54 +15,66 @@ export default function TransactionCard({
   if (!txn) return null;
 
   const isExpense = txn.type === "expense";
+
+  /** FORMAT AMOUNT */
   const amountFmt = new Intl.NumberFormat(undefined, {
     style: "currency",
     currency,
   }).format(Number(txn.amount || 0));
+
+  /** FORMAT DATE */
   const dateStr = txn.date
     ? new Date(txn.date).toLocaleDateString()
     : "—";
 
+  /** MATCH OVERVIEW PAGE GRADIENTS */
+  const cardBg = isExpense
+    ? "bg-gradient-to-br from-rose-500 to-red-600" 
+    : "bg-gradient-to-br from-emerald-500 to-teal-600"; 
+
+  const textPrimary = "text-white";
+  const textSecondary = "text-white/80";
+
   return (
-    <div className="card bg-base-100 rounded-xl shadow-md h-full">
-      <div className={`card-body flex flex-col ${compact ? "p-4" : "p-6"}`}>
+    <div className={`card rounded-xl shadow-md h-full ${cardBg}`}>
+      <div className={`card-body flex flex-col ${compact ? "p-4" : "p-6"} ${textPrimary}`}>
 
         {/* HEADER */}
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <span
-              className={`badge badge-outline ${isExpense ? "badge-error" : "badge-success"
-                }`}
+              className={`badge border-white text-white bg-white/20 backdrop-blur-sm`}
             >
               {txn.type?.toUpperCase()}
             </span>
+
             <h3 className="font-semibold text-lg">{txn.category}</h3>
           </div>
 
           <div className="text-right">
-            <p className={`text-2xl font-bold ${isExpense ? "text-error" : "text-success"}`}>
+            <p className="text-2xl font-bold">
               {isExpense ? "-" : "+"}
               {amountFmt}
             </p>
-            <p className="text-xs text-base-content/60">{dateStr}</p>
+            <p className={`text-xs ${textSecondary}`}>{dateStr}</p>
           </div>
         </div>
 
         {/* DESCRIPTION */}
-        <p className="text-sm text-base-content/70">
-          {txn.description || <span className="italic text-base-content/50">No description</span>}
+        <p className={`text-sm ${textSecondary}`}>
+          {txn.description || (
+            <span className="italic opacity-80">No description</span>
+          )}
         </p>
 
         {/* ACTIONS */}
         {showActions && (
-          <div className="mt-3 pt-3 border-t border-base-300 flex items-center justify-between">
+          <div className="mt-4 pt-3 border-t border-white/30 flex items-center justify-between">
 
-            {/* LEFT ACTIONS */}
             <div className="flex gap-3">
-
               <Link
                 to={`/transaction/${txn._id}`}
-                className="flex items-center gap-1 text-sm font-medium hover:text-primary"
+                className="flex items-center gap-1 text-sm font-medium hover:text-white"
               >
                 <HiOutlineEye className="text-lg" />
                 <span>Details</span>
@@ -70,17 +82,16 @@ export default function TransactionCard({
 
               <Link
                 to={`/transaction/update/${txn._id}`}
-                className="flex items-center gap-1 text-sm font-medium hover:text-primary"
+                className="flex items-center gap-1 text-sm font-medium hover:text-white"
               >
                 <HiOutlinePencilSquare className="text-lg" />
                 <span>Edit</span>
               </Link>
             </div>
 
-            {/* DELETE BUTTON */}
             <button
               onClick={() => onDelete?.(txn._id)}
-              className="flex items-center gap-1 text-sm font-medium text-error hover:text-error-content"
+              className="flex items-center gap-1 text-sm font-medium text-white hover:text-red-200"
             >
               <HiOutlineTrash className="text-lg" />
               <span>Delete</span>
@@ -88,6 +99,7 @@ export default function TransactionCard({
 
           </div>
         )}
+
       </div>
     </div>
   );
