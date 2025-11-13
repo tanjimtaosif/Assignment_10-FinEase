@@ -294,7 +294,7 @@ function ConfirmModal({ open, onCancel, onConfirm }) {
     return createPortal(
         <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                className="absolute inset-0 bg-white/40 backdrop-blur-sm"
                 onClick={onCancel}
             />
             <div className="relative z-10 flex min-h-full items-center justify-center px-4">
