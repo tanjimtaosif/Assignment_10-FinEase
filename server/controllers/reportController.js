@@ -1,4 +1,3 @@
-// server/controllers/reportController.js
 import Transaction from "../models/Transaction.js";
 
 export const getSummaryReports = async (req, res) => {

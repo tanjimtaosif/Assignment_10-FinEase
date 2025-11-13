@@ -1,11 +1,10 @@
-// src/pages/AddTransaction.jsx
 import { useState } from "react";
 import api from "../lib/axiosConfig";
 import { useAuth } from "../context/AuthContext";
 import { validateTransaction } from "../lib/validate";
 import toast from "react-hot-toast";
 
-// Categories by type (UI labels match "Income" / "Expense")
+// Categories by type 
 const CATEGORY_MAP = {
   Expense: [
     "Home",

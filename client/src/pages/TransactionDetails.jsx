@@ -115,13 +115,6 @@ export default function TransactionDetails() {
           />
         </div>
 
-        {/* Category total
-        <div className="mt-4 rounded-xl bg-base-200/60 px-4 py-3 text-sm text-base-content/80">
-          <span>
-            Total amount for <b>{txn.category}</b>:{" "}
-            <b>BDT {Number(categoryTotal || 0).toFixed(2)}</b>
-          </span>
-        </div> */}
 
         {/* Actions */}
         <div className="pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

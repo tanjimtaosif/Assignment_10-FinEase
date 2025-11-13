@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { useEffect, useState, useMemo } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { HiOutlineSun, HiOutlineMoon, HiBars3 } from "react-icons/hi2";

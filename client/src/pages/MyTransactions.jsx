@@ -1,4 +1,3 @@
-// src/pages/MyTransactions.jsx
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import api from "../lib/axiosConfig";

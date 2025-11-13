@@ -1,4 +1,3 @@
-// src/components/Footer.jsx
 import SiteContainer from "./SiteContainer";
 import { FaXTwitter, FaGithub, FaLinkedin } from "react-icons/fa6";
 

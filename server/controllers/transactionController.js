@@ -1,9 +1,5 @@
-// server/controllers/transactionController.js
 import Transaction from "../models/Transaction.js";
 
-/**
- * Create a new transaction
- */
 export const createTransaction = async (req, res) => {
     try {
         const payload = { ...req.body };
@@ -28,16 +24,6 @@ export const createTransaction = async (req, res) => {
     }
 };
 
-/**
- * GET /api/transactions
- * Supports:
- *  - email (required)
- *  - type: income | expense | all
- *  - q: search category/description
- *  - page, limit
- *  - sort: date | amount
- *  - order: asc | desc
- */
 export const getTransactions = async (req, res) => {
     try {
         let {
